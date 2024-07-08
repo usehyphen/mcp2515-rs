@@ -81,6 +81,7 @@ pub enum CanSpeed {
 pub enum McpSpeed {
     MHz8,
     MHz16,
+    MHz20,
 }
 
 /// Settings used to initialize the MCP2515.
@@ -103,8 +104,8 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             mode: OpMode::Normal,
-            can_speed: CanSpeed::Kbps100,
-            mcp_speed: McpSpeed::MHz16,
+            can_speed: CanSpeed::Kbps1000,
+            mcp_speed: McpSpeed::MHz20,
             clkout_en: false,
         }
     }
@@ -300,6 +301,8 @@ where
             (McpSpeed::MHz16, CanSpeed::Kbps250) => (0x41, 0xE5, 0x83),
             (McpSpeed::MHz16, CanSpeed::Kbps500) => (0x40, 0xE5, 0x83),
             (McpSpeed::MHz16, CanSpeed::Kbps1000) => (0x00, 0xCA, 0x81),
+            (McpSpeed::MHz20, CanSpeed::Kbps1000) => (0x00, 0xD9, 0x82),
+
             _ => return Err(Error::InvalidConfiguration(can_speed, mcp_speed)),
         };
         let mut cfg3 = Cnf3::from_bytes([cfg3]);
