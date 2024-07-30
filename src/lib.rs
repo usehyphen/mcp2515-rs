@@ -187,6 +187,9 @@ where
                 .with_merre(true),
         )?;
 
+        // Enable interrupts for RX0BF and RX1BF
+        self.write_registers(Register::BFPCTRL, &[0b0000_1111])?;
+
         // Receive all messages that have a standard or extended identifier. Set RXF0 up
         // for RXB0 and RXF1 up for RXB1.
         self.modify_register(
@@ -433,7 +436,7 @@ where
         // Check for any errors.
         let ctrl = self.read_txb_ctrl(&buf)?;
         if ctrl.abtf() || ctrl.mloa() || ctrl.txerr() {
-            Err(Error::TxFailed)
+            Err(Error::TxFailed(ctrl))
         } else {
             Ok(())
         }
