@@ -81,6 +81,7 @@ pub enum CanSpeed {
 pub enum McpSpeed {
     MHz8,
     MHz16,
+    MHz20,
 }
 
 /// Settings used to initialize the MCP2515.
@@ -103,8 +104,8 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             mode: OpMode::Normal,
-            can_speed: CanSpeed::Kbps100,
-            mcp_speed: McpSpeed::MHz16,
+            can_speed: CanSpeed::Kbps1000,
+            mcp_speed: McpSpeed::MHz20,
             clkout_en: false,
         }
     }
@@ -185,6 +186,9 @@ where
                 .with_errie(true)
                 .with_merre(true),
         )?;
+
+        // Enable interrupts for RX0BF and RX1BF
+        self.write_registers(Register::BFPCTRL, &[0b0000_1111])?;
 
         // Receive all messages that have a standard or extended identifier. Set RXF0 up
         // for RXB0 and RXF1 up for RXB1.
@@ -300,6 +304,8 @@ where
             (McpSpeed::MHz16, CanSpeed::Kbps250) => (0x41, 0xE5, 0x83),
             (McpSpeed::MHz16, CanSpeed::Kbps500) => (0x40, 0xE5, 0x83),
             (McpSpeed::MHz16, CanSpeed::Kbps1000) => (0x00, 0xCA, 0x81),
+            (McpSpeed::MHz20, CanSpeed::Kbps1000) => (0x00, 0xD9, 0x82),
+
             _ => return Err(Error::InvalidConfiguration(can_speed, mcp_speed)),
         };
         let mut cfg3 = Cnf3::from_bytes([cfg3]);
@@ -430,7 +436,7 @@ where
         // Check for any errors.
         let ctrl = self.read_txb_ctrl(&buf)?;
         if ctrl.abtf() || ctrl.mloa() || ctrl.txerr() {
-            Err(Error::TxFailed)
+            Err(Error::TxFailed(ctrl))
         } else {
             Ok(())
         }

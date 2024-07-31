@@ -21,6 +21,7 @@ pub enum Register {
     RXF2SIDL = 0x09,
     RXF2EID8 = 0x0A,
     RXF2EID0 = 0x0B,
+    BFPCTRL = 0x0C,
     CANSTAT = 0x0E,
     CANCTRL = 0x0F,
     RXF3SIDH = 0x10,

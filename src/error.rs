@@ -2,7 +2,7 @@ use core::fmt::Debug;
 
 use embedded_hal::can::Error as CanError;
 
-use crate::{CanSpeed, McpSpeed};
+use crate::{regs::TxbCtrl, CanSpeed, McpSpeed};
 
 pub type Result<T, SPI, HAL> = core::result::Result<T, Error<SPI, HAL>>;
 
@@ -15,7 +15,7 @@ pub enum Error<SPI: Debug, HAL: Debug> {
     /// Tx buffers are full and therefore cannot send another message.
     TxBusy,
     /// Failed to send a message.
-    TxFailed,
+    TxFailed(TxbCtrl),
     /// There was no message to be received in the Rx buffers.
     NoMessage,
     /// Received an invalid frame ID.
