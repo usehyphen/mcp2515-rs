@@ -22,6 +22,7 @@ pub enum Register {
     RXF2EID8 = 0x0A,
     RXF2EID0 = 0x0B,
     BFPCTRL = 0x0C,
+    TXRTSCTRL = 0x0D,
     CANSTAT = 0x0E,
     CANCTRL = 0x0F,
     RXF3SIDH = 0x10,
@@ -308,6 +309,21 @@ impl TxbCtrl {
     pub const MASK_TXREQ: Self = Self::from_bytes([0b0000_1000]);
 }
 
+#[bitfield]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
+#[cfg_attr(feature = "ufmt", derive(ufmt::derive::uDebug))]
+pub struct TxRtsCtrl {
+    pub b0rtsm: bool,
+    pub b1rtsm: bool,
+    pub b2rtsm: bool,
+    pub b0rts: bool,
+    pub b1rts: bool,
+    pub b2rts: bool,
+    #[skip]
+    __: B2,
+}
+
 ///////////////////
 /// Enums
 ///////////////////
@@ -451,5 +467,6 @@ reg! {
     Cnf2 => Register::CNF2,
     Cnf3 => Register::CNF3,
     Rxb0Ctrl => Register::RXB0CTRL,
-    Rxb1Ctrl => Register::RXB1CTRL
+    Rxb1Ctrl => Register::RXB1CTRL,
+    TxRtsCtrl => Register::TXRTSCTRL
 }
